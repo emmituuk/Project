@@ -23,9 +23,33 @@ def index():
 
 @app.route("/add")
 def add():
-    return render_template("add.html")
+    norm_data_countries = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()
+    # sorted by alphabetically
+    data_countries = sorted(norm_data_countries, key=lambda x:x[1])
 
-#POST-method can change e.g. insert or update the database, but GET can not.
+    def move_to_end(lst, elem):
+        new_lst = []
+        temp = None
+        for i in lst:
+            if i != elem:
+                new_lst.append(i)
+            else:
+                temp = i
+        new_lst.append(temp)
+        return new_lst
+    
+    # 'Other' is the first item --> [0]
+    # to do: make a query which return an 'other'-country's id.
+    other_value = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()[0]
+
+    # Test the function
+    sorted_countries = move_to_end(data_countries, other_value)
+
+    # sorted_countries = data_countries.sort(key=cmp_to_key(lambda x, y: 1 if x.country > y.country and x.country != "Other" else -1))
+    return render_template("add.html", data_countries = sorted_countries)
+
+
+# POST-method can change e.g. insert or update the database, but GET can not.
 @app.route("/send", methods=["POST"])
 def send():
     
@@ -56,7 +80,7 @@ def send():
     db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id})
     db.session.commit()
 
-    #after back to the front page
+    # after back to the front page
     return redirect("/")
 
 @app.route("/result")

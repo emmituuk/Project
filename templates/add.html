@@ -7,7 +7,9 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     </head>
     <body>
-          <form action="/send" method="POST">
+        <form action="/send" method="POST">
+            <br>
+            <br>
             <!-- PERSON first_name -->
             First name:
             <textarea name="first_name" rows="1" cols="20"></textarea>
@@ -22,7 +24,14 @@
             <br>
             <!-- PERSON own_country_id, alasvetovalikosta maa ja tällöin lukee maan id:n  -->
             Where are you from? Number between 393 - 588.
-            <textarea name="own_country_id" rows="1" cols="10"></textarea>
+            <!-- <textarea name="own_country_id" rows="1" cols="10"></textarea>
+            <br> -->
+            <select name="own_country_id" class="form-select">
+                <option selected>Select your country</option>
+                {% for o in data_countries %}
+                <option value="{{ o.country_id}}">{{ o.country }}</option>
+                {% endfor %}
+            </select>
             <br>
             <!-- FAVORITE_ANIMAL favorite_animal_id, alasvetovalikosta eläin ja tällöin lukee maan id:n  -->
             What is your favorite animal? Number between 391 - 585.
