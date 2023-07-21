@@ -31,6 +31,7 @@ def move_to_end(lst, elem):
 def index():
     # gets all person_ids and returns all the rows as a list of tuples
     result = db.session.execute(text("SELECT person_id FROM favorite_animals")).fetchall()
+
     # returns the number of items in result
     return render_template("index.html", count = len(result))
 
@@ -51,7 +52,14 @@ def add():
     other_elem2 = db.session.execute(text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")).fetchall()[0]
     sorted_animals = move_to_end(alph_animals, other_elem2)
 
-    return render_template("add.html", sorted_countries = sorted_countries, sorted_animals = sorted_animals)
+    # finds the 'Other' value's id from the animals table
+    other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
+
+    # finds the 'Other' value's id from the countries table
+    other_id_countries = db.session.execute(text("SELECT country_id FROM countries WHERE country = 'Other'")).fetchone()[0]
+
+    return render_template("add.html", sorted_countries = sorted_countries, sorted_animals = sorted_animals, 
+                           other_id_countries = other_id_countries, other_id_animals = other_id_animals)
 
 
 # POST-method can change e.g. insert or update the database, but GET can not.
@@ -72,17 +80,21 @@ def send():
     last_id = result.fetchone()[0]
 
     # values to the favorite_animals table
+    other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
     favorite_animal_id = request.form["favorite_animal_id"]
-    sql = text("INSERT INTO favorite_animals(person_id, favorite_animal_id, created_on)" \
-               "VALUES (:last_id, :favorite_animal_id, CURRENT_TIMESTAMP)")
-    db.session.execute(sql, {"last_id":last_id, "favorite_animal_id":favorite_animal_id})
+    other_value_a = request.form['other_animal'] if favorite_animal_id == str(other_id_animals) else None
+    sql = text("INSERT INTO favorite_animals(person_id, favorite_animal_id, other_animal, created_on)" \
+               "VALUES (:last_id, :favorite_animal_id, :other_value_a , CURRENT_TIMESTAMP)")
+    db.session.execute(sql, {"last_id":last_id, "favorite_animal_id":favorite_animal_id, "other_value_a":other_value_a})
     db.session.commit()
 
     # values to the favorite_countries table
-    favorite_country_id = request.form["favorite_country_id"]
-    sql = text("INSERT INTO favorite_countries(person_id, favorite_country_id, created_on)" \
-               "VALUES (:last_id, :favorite_country_id, CURRENT_TIMESTAMP)")
-    db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id})
+    other_id_countries = db.session.execute(text("SELECT country_id FROM countries WHERE country = 'Other'")).fetchone()[0]
+    favorite_country_id = request.form['favorite_country_id']
+    other_value_c = request.form['other_country'] if favorite_country_id == str(other_id_countries) else None
+    sql = text("INSERT INTO favorite_countries(person_id, favorite_country_id, other_country, created_on)" \
+               "VALUES (:last_id, :favorite_country_id, :other_value_c, CURRENT_TIMESTAMP)")
+    db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id, "other_value_c":other_value_c})
     db.session.commit()
 
     # after back to the front page

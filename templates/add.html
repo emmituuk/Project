@@ -11,7 +11,7 @@
             <h1 class="display-4">Add here!</h1>
             <p class="lead">Here you can add your information and your favorites.</p>
             <hr class="my-4">
-            <p><b>Warning!</b> Please do not enter your real or other personal information here. This is an example.</p>
+            <p><b>Warning!</b> Please do not enter your real personal information here. This is an example.</p>
         </div>
 
         <div class="card mx-auto shadow border" style="width: 40rem; padding: 16px;">
@@ -45,22 +45,30 @@
                     </div><br>
                     <div class="form-group">
                         <label>What is your favorite animal?</label>
-                        <select name="favorite_animal_id" class="custom-select">
+                        <select name="favorite_animal_id" class="custom-select" id="favorite_animal_id" >
                             <option selected disabled value>Select here</option>
                             {% for o in sorted_animals %}
-                            <option value="{{ o.animal_id}}">{{ o.animal }}</option>
+                                <option value="{{ o.animal_id }}">{{ o.animal }}</option>
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="form-group" id="other-input1" style="display: none;">
+                        <label><b>Enter other animal:</b></label>
+                        <input name="other_animal" type="text" class="form-control" id="other_animal">
+                    </div>
                     <div class="form-group">
                         <label>What is your favorite country?</label>
-                        <select name="favorite_country_id" class="custom-select">
+                        <select name="favorite_country_id" class="custom-select" id="favorite_country_id" >
                             <option selected disabled value>Select here</option>
                             {% for o in sorted_countries %}
-                            <option value="{{ o.country_id}}">{{ o.country }}</option>
+                                <option value="{{ o.country_id }}">{{ o.country }}</option>
                             {% endfor %}
                         </select>
-                    </div><br>
+                    </div>
+                    <div class="form-group" id="other-input2" style="display: none;">
+                        <label><b>Enter other country:</b></label>
+                        <input name="other_country" type="text" class="form-control" id="other_country">
+                    </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary" value="Send">Submit form</button>
                     </div>
@@ -69,5 +77,33 @@
         </div>
         <br>
         <br>
+        <!-- animals -->
+        <script>
+            document.getElementById('favorite_animal_id').addEventListener('change', function() {
+            var selectedAnimal = this.value;
+            var otherInput = document.getElementById('other-input1');
+            // the Flask data in JavaScript
+            var other_id_animals = '{{ other_id_animals}}';
+            if (selectedAnimal === other_id_animals) {
+                otherInput.style.display = 'block';
+            } else {
+                otherInput.style.display = 'none';
+            }
+        });
+        </script>
+        <!-- countries -->
+        <script>
+            document.getElementById('favorite_country_id').addEventListener('change', function() {
+            var selectedCountry = this.value;
+            var otherInput = document.getElementById('other-input2');
+            // the Flask data in JavaScript
+            var other_id_countries = '{{ other_id_countries }}';
+            if (selectedCountry === other_id_countries) {
+                otherInput.style.display = 'block';
+            } else {
+                otherInput.style.display = 'none';
+            }
+        });
+        </script>
     </body>
 </html>
