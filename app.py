@@ -14,6 +14,19 @@ app.config.update(
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 db = SQLAlchemy(app)
 
+# this function can move a list element to the end of the list
+# required in drop-down/select menus
+def move_to_end(lst, elem):
+    new_lst = []
+    temp = None
+    for i in lst:
+        if i != elem:
+            new_lst.append(i)
+        else:
+            temp = i
+    new_lst.append(temp)
+    return new_lst
+
 @app.route("/")
 def index():
     # gets all person_ids and returns all the rows as a list of tuples
@@ -23,30 +36,22 @@ def index():
 
 @app.route("/add")
 def add():
-    norm_data_countries = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()
-    # sorted by alphabetically
-    data_countries = sorted(norm_data_countries, key=lambda x:x[1])
+    # next making the drop-down menu values for own_country_id and favorite_country_id
+    original_countries = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()
+    # sorts countries by alphabetically
+    alph_countries = sorted(original_countries, key=lambda x:x[1])
+    # fetches the row of the query result and returns a row as a list of tuples
+    other_elem1 = db.session.execute(text("SELECT country_id, country FROM countries WHERE country = 'Other'")).fetchall()[0]
+    # moves other_elem to the end of the list
+    sorted_countries = move_to_end(alph_countries, other_elem1)
 
-    def move_to_end(lst, elem):
-        new_lst = []
-        temp = None
-        for i in lst:
-            if i != elem:
-                new_lst.append(i)
-            else:
-                temp = i
-        new_lst.append(temp)
-        return new_lst
-    
-    # 'Other' is the first item --> [0]
-    # to do: make a query which return an 'other'-country's id.
-    other_value = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()[0]
+    # next making the drop-down menu values for favorite_animals_id
+    original_animals = db.session.execute(text("SELECT animal_id, animal FROM animals")).fetchall()
+    alph_animals = sorted(original_animals, key=lambda x:x[1])
+    other_elem2 = db.session.execute(text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")).fetchall()[0]
+    sorted_animals = move_to_end(alph_animals, other_elem2)
 
-    # Test the function
-    sorted_countries = move_to_end(data_countries, other_value)
-
-    # sorted_countries = data_countries.sort(key=cmp_to_key(lambda x, y: 1 if x.country > y.country and x.country != "Other" else -1))
-    return render_template("add.html", data_countries = sorted_countries)
+    return render_template("add.html", sorted_countries = sorted_countries, sorted_animals = sorted_animals)
 
 
 # POST-method can change e.g. insert or update the database, but GET can not.

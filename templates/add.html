@@ -10,36 +10,39 @@
         <form action="/send" method="POST">
             <br>
             <br>
-            <!-- PERSON first_name -->
             First name:
             <textarea name="first_name" rows="1" cols="20"></textarea>
             <br>
-            <!-- PERSON last_name -->
             Last name:
             <textarea name="last_name" rows="1" cols="20"></textarea>
             <br>
-            <!-- PERSON email -->
             Email address:
             <textarea name="email" rows="1" cols="40"></textarea>
             <br>
-            <!-- PERSON own_country_id, alasvetovalikosta maa ja tällöin lukee maan id:n  -->
-            Where are you from? Number between 393 - 588.
-            <!-- <textarea name="own_country_id" rows="1" cols="10"></textarea>
-            <br> -->
-            <select name="own_country_id" class="form-select">
+            Where are you from?
+            <select name="own_country_id" class="form-select" aria-label="Default select example">
                 <option selected>Select your country</option>
-                {% for o in data_countries %}
+                {% for o in sorted_countries %}
                 <option value="{{ o.country_id}}">{{ o.country }}</option>
                 {% endfor %}
             </select>
             <br>
-            <!-- FAVORITE_ANIMAL favorite_animal_id, alasvetovalikosta eläin ja tällöin lukee maan id:n  -->
-            What is your favorite animal? Number between 391 - 585.
-            <textarea name="favorite_animal_id" rows="1" cols="10"></textarea>
+            What is your favorite animal?
+            <select name="favorite_animal_id" class="form-select" aria-label="Default select example">
+                <option selected>Select your favorite animal</option>
+                {% for o in sorted_animals %}
+                <option value="{{ o.animal_id}}">{{ o.animal }}</option>
+                {% endfor %}
+            </select>
             <br>
-            <!-- FAVORITE_COUNTRY favorite_country_id, alasvetovalikosta maa ja tällöin lukee maan id:n  -->
-            What is your favorite country? Number between 393 - 588.
-            <textarea name="favorite_country_id" rows="1" cols="10"></textarea>
+            What is your favorite country?
+            <select name="favorite_country_id" class="form-select" aria-label="Default select example">
+                <option selected>Select your favorite country</option>
+                {% for o in sorted_countries %}
+                <option value="{{ o.country_id}}">{{ o.country }}</option>
+                {% endfor %}
+            </select>
+            <br>
             <br>
             <input type="submit" value="Send">
             <br>
