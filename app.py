@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from os import getenv
 from sqlalchemy.sql import text #for making queries
@@ -10,12 +10,11 @@ app.debug = True
 app.config.update(
     TEMPLATES_AUTO_RELOAD=True
 )
-# connection to the database
+
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 db = SQLAlchemy(app)
 
-# this function can move a list element to the end of the list
-# required in drop-down/select menus
+# this function can move a list element to the end of the list, required in the drop-down/select menu
 def move_to_end(lst, elem):
     new_lst = []
     temp = None
@@ -26,6 +25,16 @@ def move_to_end(lst, elem):
             temp = i
     new_lst.append(temp)
     return new_lst
+
+@app.route('/check_email_availability', methods=['POST'])
+def check_email_availability():
+    email = request.json.get('email')
+    sql = text("SELECT email FROM person WHERE email = :email")
+    result = db.session.execute(sql, {"email":email}).fetchone()
+
+    is_email_available = not bool(result) # True if email not found, False if email found
+
+    return jsonify({'available': is_email_available})
 
 @app.route("/")
 def index():
@@ -62,9 +71,9 @@ def add():
 def send():
     
     # values to the person table
+    email = request.form["email"]
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
-    email = request.form["email"]
     own_country_id = request.form["own_country_id"]
     sql = text("INSERT INTO person (first_name, last_name, email, own_country_id, created_on)" \
                "VALUES (:first_name, :last_name, :email, :own_country_id, CURRENT_TIMESTAMP)" \
@@ -77,10 +86,10 @@ def send():
     # values to the favorite_animals table
     other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
     favorite_animal_id = request.form["favorite_animal_id"]
-    other_value_a = request.form['other_animal'] if favorite_animal_id == str(other_id_animals) else None
+    other_animal = request.form['other_animal'] if favorite_animal_id == str(other_id_animals) else None
     sql = text("INSERT INTO favorite_animals(person_id, favorite_animal_id, other_animal, created_on)" \
-               "VALUES (:last_id, :favorite_animal_id, :other_value_a , CURRENT_TIMESTAMP)")
-    db.session.execute(sql, {"last_id":last_id, "favorite_animal_id":favorite_animal_id, "other_value_a":other_value_a})
+               "VALUES (:last_id, :favorite_animal_id, :other_animal , CURRENT_TIMESTAMP)")
+    db.session.execute(sql, {"last_id":last_id, "favorite_animal_id":favorite_animal_id, "other_animal":other_animal})
     db.session.commit()
 
     # values to the favorite_countries table
@@ -90,7 +99,6 @@ def send():
     db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id})
     db.session.commit()
 
-    # after back to the front page
     return redirect("/")
 
 @app.route("/result")
