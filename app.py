@@ -40,26 +40,21 @@ def add():
     # next making the drop-down menu values for own_country_id and favorite_country_id
     original_countries = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()
     # sorts countries by alphabetically
-    alph_countries = sorted(original_countries, key=lambda x:x[1])
-    # fetches the row of the query result and returns a row as a list of tuples
-    other_elem1 = db.session.execute(text("SELECT country_id, country FROM countries WHERE country = 'Other'")).fetchall()[0]
-    # moves other_elem to the end of the list
-    sorted_countries = move_to_end(alph_countries, other_elem1)
+    sorted_countries = sorted(original_countries, key=lambda x:x[1])
 
     # next making the drop-down menu values for favorite_animals_id
     original_animals = db.session.execute(text("SELECT animal_id, animal FROM animals")).fetchall()
     alph_animals = sorted(original_animals, key=lambda x:x[1])
-    other_elem2 = db.session.execute(text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")).fetchall()[0]
-    sorted_animals = move_to_end(alph_animals, other_elem2)
+    # fetches the row of the query result and returns a row as a list of tuples
+    other_elem = db.session.execute(text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")).fetchall()[0]
+    # moves other_elem to the end of the list
+    sorted_animals = move_to_end(alph_animals, other_elem)
 
     # finds the 'Other' value's id from the animals table
     other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
 
-    # finds the 'Other' value's id from the countries table
-    other_id_countries = db.session.execute(text("SELECT country_id FROM countries WHERE country = 'Other'")).fetchone()[0]
-
     return render_template("add.html", sorted_countries = sorted_countries, sorted_animals = sorted_animals, 
-                           other_id_countries = other_id_countries, other_id_animals = other_id_animals)
+                           other_id_animals = other_id_animals)
 
 
 # POST-method can change e.g. insert or update the database, but GET can not.
@@ -89,12 +84,10 @@ def send():
     db.session.commit()
 
     # values to the favorite_countries table
-    other_id_countries = db.session.execute(text("SELECT country_id FROM countries WHERE country = 'Other'")).fetchone()[0]
     favorite_country_id = request.form['favorite_country_id']
-    other_value_c = request.form['other_country'] if favorite_country_id == str(other_id_countries) else None
-    sql = text("INSERT INTO favorite_countries(person_id, favorite_country_id, other_country, created_on)" \
-               "VALUES (:last_id, :favorite_country_id, :other_value_c, CURRENT_TIMESTAMP)")
-    db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id, "other_value_c":other_value_c})
+    sql = text("INSERT INTO favorite_countries(person_id, favorite_country_id, created_on)" \
+               "VALUES (:last_id, :favorite_country_id, CURRENT_TIMESTAMP)")
+    db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id})
     db.session.commit()
 
     # after back to the front page
