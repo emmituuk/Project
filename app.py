@@ -38,38 +38,37 @@ def check_email_availability():
 
 @app.route("/")
 def index():
-    # gets all person_ids and returns all the rows as a list of tuples
-    result = db.session.execute(text("SELECT person_id FROM favorite_animals")).fetchall()
-
-    # returns the number of items in result
+    sql = text("SELECT person_id FROM favorite_animals")
+    result = db.session.execute(sql).fetchall()
     return render_template("index.html", count = len(result))
 
 @app.route("/add")
 def add():
     # next making the drop-down menu values for own_country_id and favorite_country_id
-    original_countries = db.session.execute(text("SELECT country_id, country FROM countries")).fetchall()
+    sql = text("SELECT country_id, country FROM countries")
+    original_countries = db.session.execute(sql).fetchall()
     # sorts countries by alphabetically
     sorted_countries = sorted(original_countries, key=lambda x:x[1])
 
     # next making the drop-down menu values for favorite_animals_id
-    original_animals = db.session.execute(text("SELECT animal_id, animal FROM animals")).fetchall()
+    sql = text("SELECT animal_id, animal FROM animals")
+    original_animals = db.session.execute(sql).fetchall()
     alph_animals = sorted(original_animals, key=lambda x:x[1])
     # fetches the row of the query result and returns a row as a list of tuples
-    other_elem = db.session.execute(text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")).fetchall()[0]
+    sql = text("SELECT animal_id, animal FROM animals WHERE animal = 'Other'")
+    other_elem = db.session.execute(sql).fetchall()[0]
     # moves other_elem to the end of the list
     sorted_animals = move_to_end(alph_animals, other_elem)
 
     # finds the 'Other' value's id from the animals table
-    other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
+    sql = text("SELECT animal_id FROM animals WHERE animal = 'Other'")
+    other_id_animals = db.session.execute(sql).fetchone()[0]
 
     return render_template("add.html", sorted_countries = sorted_countries, sorted_animals = sorted_animals, 
                            other_id_animals = other_id_animals)
 
-
-# POST-method can change e.g. insert or update the database, but GET can not.
 @app.route("/send", methods=["POST"])
 def send():
-    
     # values to the person table
     email = request.form["email"]
     first_name = request.form["first_name"]
@@ -78,7 +77,6 @@ def send():
     sql = text("INSERT INTO person (first_name, last_name, email, own_country_id, created_on)" \
                "VALUES (:first_name, :last_name, :email, :own_country_id, CURRENT_TIMESTAMP)" \
                 "RETURNING person_id")
-    # executes
     result = db.session.execute(sql, {"first_name":first_name, "last_name":last_name, "email":email, "own_country_id":own_country_id})
     # Get the person_id of the newly inserted person
     last_id = result.fetchone()[0]
@@ -108,4 +106,3 @@ def result():
 if __name__ == "__main__":
     server = Server(app.wsgi_app)
     server.serve(port=5000)
-    # server.watch("templates/*.*")
