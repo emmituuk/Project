@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import getenv
 from sqlalchemy.sql import text #for making queries
 from livereload import Server
+from functions import move_to_end, is_valid_animal_id, is_valid_country_id
 
 app = Flask(__name__)
 app.debug = True
@@ -13,18 +14,6 @@ app.config.update(
 
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 db = SQLAlchemy(app)
-
-# this function can move a list element to the end of the list, required in the drop-down/select menu
-def move_to_end(lst, elem):
-    new_lst = []
-    temp = None
-    for i in lst:
-        if i != elem:
-            new_lst.append(i)
-        else:
-            temp = i
-    new_lst.append(temp)
-    return new_lst
 
 @app.route('/check_email_availability', methods=['POST'])
 def check_email_availability():
@@ -82,8 +71,11 @@ def send():
     last_id = result.fetchone()[0]
 
     # values to the favorite_animals table
-    other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
     favorite_animal_id = request.form["favorite_animal_id"]
+    if not is_valid_animal_id(text, db, favorite_animal_id):
+        return "Invalid favorite animal ID.", 400
+    
+    other_id_animals = db.session.execute(text("SELECT animal_id FROM animals WHERE animal = 'Other'")).fetchone()[0]
     other_animal = request.form['other_animal'] if favorite_animal_id == str(other_id_animals) else None
     sql = text("INSERT INTO favorite_animals(person_id, favorite_animal_id, other_animal, created_on)" \
                "VALUES (:last_id, :favorite_animal_id, :other_animal , CURRENT_TIMESTAMP)")
@@ -92,6 +84,9 @@ def send():
 
     # values to the favorite_countries table
     favorite_country_id = request.form['favorite_country_id']
+    if not is_valid_country_id(text, db, favorite_country_id):
+        return "Invalid favorite country ID.", 400
+
     sql = text("INSERT INTO favorite_countries(person_id, favorite_country_id, created_on)" \
                "VALUES (:last_id, :favorite_country_id, CURRENT_TIMESTAMP)")
     db.session.execute(sql, {"last_id":last_id, "favorite_country_id":favorite_country_id})
