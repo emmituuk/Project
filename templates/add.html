@@ -193,10 +193,9 @@
             "Please enter a valid email address in the format name@example.com.";
         }
       }
-
       document
         .getElementById("email")
-        .addEventListener("blur", checkEmailAvailability);
+        .addEventListener("input", checkEmailAvailability);
 
       // validation for others
       (function () {
