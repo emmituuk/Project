@@ -1,168 +1,230 @@
-
 <html>
-    <head>
-        <title>
-            Your favorites
-        </title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    </head>
-    <body>
-        <div class="jumbotron">
-            <h1 class="display-4">Add here!</h1>
-            <p class="lead">Here you can add your information and your favorites. You can add information only once with one email address.</p>
-            <hr class="my-4">
-            <p><b>Warning!</b> Please do not enter your real personal information here. This is an example.</p>
-        </div>
-        <div class="card mx-auto shadow border" style="width: 40rem; padding: 16px;">
-            <div class="card-body">
-                <form class="needs-validation" novalidate action="/send" method="POST">
-                    <div class="form-row">
-                        <div class="form-group col-md-6 mb-3">
-                          <label for="validationCustom01">First name</label>
-                          <input name="first_name" type="text" class="form-control" id="validationCustom01" required>
-                          <div class="invalid-feedback">
-                            Please enter your first name.
-                          </div>
-                        </div>
-                        <div class="form-group col-md-6 mb-3">
-                          <label for="validationCustom02">Last name</label>
-                          <input name="last_name" type="text" class="form-control" id="validationCustom02" required>
-                          <div class="invalid-feedback">
-                            Please enter your last name.
-                          </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="validationEmail">Email</label>
-                        <input name="email" type="email" class="form-control" id="validationEmail" required>
-                        <div class="invalid-feedback" id="emailFeedback">
-                            Please enter your email.
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="validationCustom04">Country</label>
-                        <select name="own_country_id" class="custom-select" id="validationCustom04" required>
-                            <option selected disabled value>Select here</option>
-                            {% for o in sorted_countries %}
-                            <option value="{{ o.country_id}}">{{ o.country }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select your country. Where are you from?
-                        </div>
-                    </div><br>
-                    <div>
-                        <b>Now it's time to fill in your favorites. Please select below.</b>
-                    </div><br>
-                    <div class="form-group">
-                        <label>What is your favorite animal?</label>
-                        <select name="favorite_animal_id" class="custom-select" id="favorite_animal_id" required>
-                            <option selected disabled value>Select here</option>
-                            {% for o in sorted_animals %}
-                                <option value="{{ o.animal_id }}">{{ o.animal }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select your favorite animal.
-                        </div>
-                    </div>
-                    <div class="form-group" id="other-input" style="display: none;">
-                        <label><b>Enter other animal:</b></label>
-                        <input name="other_animal" type="text" class="form-control" id="other_animal">
-                        <div class="invalid-feedback">
-                            Please enter the name of your favorite animal.
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="validationCustom05">What is your favorite country?</label>
-                        <select name="favorite_country_id" class="custom-select" id="validationCustom05" required>
-                            <option selected disabled value>Select here</option>
-                            {% for o in sorted_countries %}
-                                <option value="{{ o.country_id }}">{{ o.country }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            Please select your favorite country.
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary" value="Send">Submit form</button>
-                    </div>
-                </form>
+  <head>
+    <title>Your favorites</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div class="jumbotron">
+      <h1 class="display-4">Add here!</h1>
+      <p class="lead">
+        Here you can add your information and your favorites. You can add
+        information only once with one email address.
+      </p>
+      <hr class="my-4" />
+      <p>
+        <b>Warning!</b> Please do not enter your real personal information here.
+        This is an example.
+      </p>
+    </div>
+    <div class="card mx-auto shadow border" style="width: 40rem; padding: 16px">
+      <div class="card-body">
+        <form class="needs-validation" novalidate action="/send" method="POST">
+          <div class="form-row">
+            <div class="form-group col-md-6 mb-3">
+              <label for="first_name">First name</label>
+              <input
+                name="first_name"
+                type="text"
+                class="form-control"
+                id="first_name"
+                required
+              />
+              <div class="invalid-feedback">Please enter your first name.</div>
             </div>
-        </div>
+            <div class="form-group col-md-6 mb-3">
+              <label for="last_name">Last name</label>
+              <input
+                name="last_name"
+                type="text"
+                class="form-control"
+                id="last_name"
+                required
+              />
+              <div class="invalid-feedback">Please enter your last name.</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              name="email"
+              type="email"
+              class="form-control"
+              id="email"
+              required
+            />
+            <div class="invalid-feedback" id="emailFeedback">
+              Please enter your email.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="own_country_id">Country</label>
+            <select
+              name="own_country_id"
+              class="custom-select"
+              id="own_country_id"
+              required
+            >
+              <option selected disabled value>Select here</option>
+              {% for o in sorted_countries %}
+              <option value="{{ o.country_id}}">{{ o.country }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">
+              Please select your country. Where are you from?
+            </div>
+          </div>
+          <br />
+          <div>
+            <b>Now it's time to fill in your favorites. Please select below.</b>
+          </div>
+          <br />
+          <div class="form-group">
+            <label>What is your favorite animal?</label>
+            <select
+              name="favorite_animal_id"
+              class="custom-select"
+              id="favorite_animal_id"
+              required
+            >
+              <option selected disabled value>Select here</option>
+              {% for o in sorted_animals %}
+              <option value="{{ o.animal_id }}">{{ o.animal }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">
+              Please select your favorite animal.
+            </div>
+          </div>
+          <div class="form-group" id="other_input" style="display: none">
+            <label><b>Enter other animal:</b></label>
+            <input
+              name="other_animal"
+              type="text"
+              class="form-control"
+              id="other_animal"
+            />
+            <div class="invalid-feedback">
+              Please enter the name of your favorite animal.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="favorite_country_id"
+              >What is your favorite country?</label
+            >
+            <select
+              name="favorite_country_id"
+              class="custom-select"
+              id="favorite_country_id"
+              required
+            >
+            	<option selected disabled value>Select here</option>
+              {% for o in sorted_countries %}
+              <option value="{{ o.country_id }}">{{ o.country }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">
+              Please select your favorite country.
+            </div>
+          </div>
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary" value="Send">
+              Submit form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-        <script>
-            document.getElementById('favorite_animal_id').addEventListener('change', function() {
-                var selectedAnimal = this.value;
-                var otherInput = document.getElementById('other-input');
-                var otherAnimal = document.getElementById('other_animal');
-                // the Flask data in JavaScript
-                var other_id_animals = '{{ other_id_animals}}';
-                if (selectedAnimal === other_id_animals) {
-                    otherInput.style.display = 'block';
-                    otherAnimal.setAttribute("required", "true");
-                } else {
-                    otherInput.style.display = 'none';
-                    otherAnimal.removeAttribute("required");
-                }
+    <script>
+      document
+        .getElementById("favorite_animal_id")
+        .addEventListener("change", function () {
+          var selectedAnimal = this.value;
+          var otherInput = document.getElementById("other_input");
+          var otherAnimal = document.getElementById("other_animal");
+          // the Flask data in JavaScript
+          var other_id_animals = "{{ other_id_animals}}";
+          if (selectedAnimal === other_id_animals) {
+            otherInput.style.display = "block";
+            otherAnimal.setAttribute("required", "true");
+          } else {
+            otherInput.style.display = "none";
+            otherAnimal.removeAttribute("required");
+          }
+        });
+
+      // email validation
+      function validateEmailFormat(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+
+      function checkEmailAvailability() {
+        const emailInput = document.getElementById("email");
+        const email = emailInput.value.trim();
+
+        if (validateEmailFormat(email)) {
+          fetch("/check_email_availability", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: email }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.available) {
+                emailInput.setCustomValidity("");
+              } else {
+                emailInput.setCustomValidity("This email is already used.");
+                document.getElementById("emailFeedback").textContent =
+                  "This email address has already been used to submit information. You can add information only once with one email address.";
+              }
+            })
+            .catch((error) => {
+              console.error("Error checking email availability:", error);
             });
+        } else {
+          emailInput.setCustomValidity("Please enter a valid email address.");
+          document.getElementById("emailFeedback").textContent =
+            "Please enter a valid email address in the format name@example.com.";
+        }
+      }
 
-            // TODO: fix validation feedback
-            // email validation
-            function validateEmailFormat(email) {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                return emailRegex.test(email);
-            }
+      document
+        .getElementById("email")
+        .addEventListener("blur", checkEmailAvailability);
 
-            function checkEmailAvailability() {
-                const emailInput = document.getElementById("validationEmail");
-                const email = emailInput.value.trim();
-
-                if (validateEmailFormat(email)) {
-                    fetch("/check_email_availability", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ email: email }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.available) {
-                            emailInput.setCustomValidity("");
-                        } else {
-                            emailInput.setCustomValidity("This email is already used.");
-                            document.getElementById("emailFeedback").textContent = "This email is already used.";
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error checking email availability:", error);
-                    });
-                } else {
-                    emailInput.setCustomValidity("Please enter a valid email address.");
-                    document.getElementById("emailFeedback").textContent = "Please enter a valid email address following format name@example.com.";
-                }
-            }
-
-            document.getElementById("validationEmail").addEventListener("blur", checkEmailAvailability);
-
-            // validation for others
-                (function() {
-                'use strict';
-                window.addEventListener('load', function() {
-                    var forms = document.getElementsByClassName('needs-validation');
-                    var validation = Array.prototype.filter.call(forms, function(form) {
-                    form.addEventListener('submit', function(event) {
-                        if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        }
-                        form.classList.add('was-validated');
-                    }, false);
-                    });
-                }, false);
-                })();
-            </script>
-    </body>
+      // validation for others
+      (function () {
+        "use strict";
+        window.addEventListener(
+          "load",
+          function () {
+            var forms = document.getElementsByClassName("needs-validation");
+            var validation = Array.prototype.filter.call(
+              forms,
+              function (form) {
+                form.addEventListener(
+                  "submit",
+                  function (event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add("was-validated");
+                  },
+                  false
+                );
+              }
+            );
+          },
+          false
+        );
+      })();
+    </script>
+  </body>
 </html>
