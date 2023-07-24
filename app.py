@@ -21,7 +21,7 @@ def check_email_availability():
     sql = text("SELECT email FROM person WHERE email = :email")
     result = db.session.execute(sql, {"email":email}).fetchone()
 
-    is_email_available = not bool(result) # True if email not found, False if email found
+    is_email_available = not bool(result) # true if email not found, false if email found
 
     return jsonify({'available': is_email_available})
 
@@ -63,10 +63,14 @@ def send():
     first_name = request.form["first_name"]
     last_name = request.form["last_name"]
     own_country_id = request.form["own_country_id"]
+    if not is_valid_country_id(text, db, own_country_id):
+        return "Invalid own country ID.", 400
+
     sql = text("INSERT INTO person (first_name, last_name, email, own_country_id, created_on)" \
                "VALUES (:first_name, :last_name, :email, :own_country_id, CURRENT_TIMESTAMP)" \
                 "RETURNING person_id")
     result = db.session.execute(sql, {"first_name":first_name, "last_name":last_name, "email":email, "own_country_id":own_country_id})
+    
     # Get the person_id of the newly inserted person
     last_id = result.fetchone()[0]
 
