@@ -5,6 +5,10 @@ from os import getenv
 from sqlalchemy.sql import text  # for making queries
 from livereload import Server
 
+import json
+import plotly
+import plotly.graph_objs as go
+
 from functions import move_to_end, is_valid_animal_id, is_valid_country_id
 from error_handlers import (
     bad_request,
@@ -172,7 +176,98 @@ def send():
 
 @app.route("/result")
 def result():
-    return "here you can see some results"
+    # TOP 5 favorite animals
+    sql = text(
+        "SELECT animal AS favorite_animal, COUNT(*) AS total "
+        "FROM favorite_animals "
+        "INNER JOIN animals "
+        "ON favorite_animals.favorite_animal_id = animals.animal_id "
+        "GROUP BY favorite_animal "
+        "ORDER BY total DESC "
+        "LIMIT 5"
+    )
+    result = db.session.execute(sql).fetchall()
+
+    # processing the data
+    favorite_animal = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    # creating the graph using Plotly
+    graph_data = [go.Bar(x=favorite_animal, y=total, marker=dict(color="blue"))]
+
+    graph_layout = go.Layout(
+        title="Favorite animals TOP 5",
+        xaxis=dict(title="Animal"),
+        yaxis=dict(title="Total"),
+    )
+    graph_figure = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_animal = json.dumps(graph_figure, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # TOP 5 favorite countries
+    sql = text(
+        "SELECT country AS favorite_country, COUNT(*) AS total "
+        "FROM favorite_countries "
+        "INNER JOIN countries "
+        "ON favorite_countries.favorite_country_id = countries.country_id "
+        "GROUP BY favorite_country "
+        "ORDER BY total DESC "
+        "LIMIT 5"
+    )
+    result = db.session.execute(sql).fetchall()
+
+    # processing the data
+    favorite_country = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    # creating the graph using Plotly
+    graph_data = [go.Bar(x=favorite_country, y=total, marker=dict(color="blue"))]
+
+    graph_layout = go.Layout(
+        title="Favorite countries TOP 5",
+        xaxis=dict(title="Country"),
+        yaxis=dict(title="Total"),
+    )
+    graph_figure = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_country = json.dumps(graph_figure, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # map-graph
+
+    sql = text(
+        "SELECT country, COUNT(*) AS total FROM person "
+        "INNER JOIN countries "
+        "ON person.own_country_id = countries.country_id "
+        "GROUP BY country"
+    )
+    result = db.session.execute(sql).fetchall()
+
+    # creating the Choropleth Map
+    data = go.Choropleth(
+        locations=[row[0] for row in result],
+        z=[row[1] for row in result],
+        locationmode="country names",
+        colorscale="Viridis",
+        colorbar=dict(title="Number of People"),
+    )
+    layout = go.Layout(
+        title="Geographic Distribution of Favorite Entries",
+        geo=dict(
+            showframe=False,
+            showcoastlines=False,
+            projection_type="natural earth",
+        ),
+    )
+    map_figure = go.Figure(data=data, layout=layout)
+    map_json = json.dumps(map_figure, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # using render_template to pass graphJSONs to html
+    return render_template(
+        "result.html",
+        graph_json_animal=graph_json_animal,
+        graph_json_country=graph_json_country,
+        map_json=map_json,
+    )
 
 
 if __name__ == "__main__":
