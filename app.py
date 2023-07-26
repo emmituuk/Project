@@ -193,16 +193,21 @@ def result():
     total = [row[1] for row in result]
 
     # creating the graph using Plotly
-    graph_data = [go.Bar(x=favorite_animal, y=total, marker=dict(color="blue"))]
+    graph_data = [
+        go.Bar(x=favorite_animal, y=total, marker=dict(color="rgb(69, 147, 165)"))
+    ]
 
     graph_layout = go.Layout(
         title="Favorite animals TOP 5",
         xaxis=dict(title="Animal"),
         yaxis=dict(title="Total"),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
     )
-    graph_figure = go.Figure(data=graph_data, layout=graph_layout)
+    graph_figure_animal = go.Figure(data=graph_data, layout=graph_layout)
 
-    graph_json_animal = json.dumps(graph_figure, cls=plotly.utils.PlotlyJSONEncoder)
+    graph_json_animal = json.dumps(
+        graph_figure_animal, cls=plotly.utils.PlotlyJSONEncoder
+    )
 
     # TOP 5 favorite countries
     sql = text(
@@ -221,19 +226,23 @@ def result():
     total = [row[1] for row in result]
 
     # creating the graph using Plotly
-    graph_data = [go.Bar(x=favorite_country, y=total, marker=dict(color="blue"))]
+    graph_data = [
+        go.Bar(x=favorite_country, y=total, marker=dict(color="rgb(69, 147, 165)"))
+    ]
 
     graph_layout = go.Layout(
         title="Favorite countries TOP 5",
         xaxis=dict(title="Country"),
         yaxis=dict(title="Total"),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
     )
-    graph_figure = go.Figure(data=graph_data, layout=graph_layout)
+    graph_figure_country = go.Figure(data=graph_data, layout=graph_layout)
 
-    graph_json_country = json.dumps(graph_figure, cls=plotly.utils.PlotlyJSONEncoder)
+    graph_json_country = json.dumps(
+        graph_figure_country, cls=plotly.utils.PlotlyJSONEncoder
+    )
 
     # map-graph
-
     sql = text(
         "SELECT country, COUNT(*) AS total FROM person "
         "INNER JOIN countries "
@@ -243,23 +252,31 @@ def result():
     result = db.session.execute(sql).fetchall()
 
     # creating the Choropleth Map
+
+    custom_colorscale = [
+        [0.0, "rgb(220, 201, 155)"],
+        [0.5, "rgb(179, 199, 184)"],
+        [1.0, "rgb(43, 136, 162)"],
+    ]
+
     data = go.Choropleth(
         locations=[row[0] for row in result],
         z=[row[1] for row in result],
         locationmode="country names",
-        colorscale="Viridis",
+        colorscale=custom_colorscale,
+        # best colour:YlGnBu,YlOrRd, Earth
         colorbar=dict(title="Number of People"),
     )
     layout = go.Layout(
         title="Geographic Distribution of Favorite Entries",
-        geo=dict(
-            showframe=False,
-            showcoastlines=False,
-            projection_type="natural earth",
-        ),
+        geo=dict(projection_type="natural earth"),
     )
     map_figure = go.Figure(data=data, layout=layout)
     map_json = json.dumps(map_figure, cls=plotly.utils.PlotlyJSONEncoder)
+
+    # total favorite entries - same value also in the person table and the favorite_animals table
+    sql = text("SELECT COUNT(*) FROM favorite_animals")
+    total_entries = db.session.execute(sql).fetchone()[0]
 
     # using render_template to pass graphJSONs to html
     return render_template(
@@ -267,6 +284,7 @@ def result():
         graph_json_animal=graph_json_animal,
         graph_json_country=graph_json_country,
         map_json=map_json,
+        total_entries=total_entries,
     )
 
 

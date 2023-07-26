@@ -5,19 +5,22 @@
   </head>
   <body>
     <h1>Results</h1>
-    <div id="chart_favorite_animals" class="chart"></div>
-    <div id="chart_favorite_countries" class="chart"></div>
-    <div id="chart_map" class="chart"></div>
+    <div>Total entries: {{ total_entries }}</div>
+    <div id="bar-graph-animal" class="chart"></div>
+    <div id="bar-graph-country" class="chart"></div>
+    <div id="choropleth-map" class="chart"></div>
   </body>
+
   <script type="text/javascript">
     // IMPORTANT! Do not use "", only '' e.g. JSON.parse('{{graph_json|safe}}')
     var graphJson = JSON.parse('{{ graph_json_animal|safe }}');
-    Plotly.plot("chart_favorite_animals", graphJson.data, graphJson.layout);
+    Plotly.plot("bar-graph-animal", graphJson.data, graphJson.layout);
 
     var graphJson = JSON.parse('{{ graph_json_country|safe }}');
-    Plotly.plot("chart_favorite_countries", graphJson.data, graphJson.layout);
+    Plotly.plot("bar-graph-country", graphJson.data, graphJson.layout);
 
     var mapJason = JSON.parse('{{ map_json|safe }}');
-    Plotly.newPlot('chart_map', mapJason.data, mapJason.layout)
-  </script>
+    Plotly.newPlot('choropleth-map', mapJason.data, mapJason.layout)
+  </script> 
+
 </html>
