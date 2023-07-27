@@ -186,6 +186,7 @@ def result():
         "ORDER BY total DESC "
         "LIMIT 5"
     )
+
     result = db.session.execute(sql).fetchall()
 
     # processing the data
@@ -242,7 +243,7 @@ def result():
         graph_figure_country, cls=plotly.utils.PlotlyJSONEncoder
     )
 
-    # map-graph
+    # creating the Choropleth Map
     sql = text(
         "SELECT country, COUNT(*) AS total FROM person "
         "INNER JOIN countries "
@@ -250,8 +251,6 @@ def result():
         "GROUP BY country"
     )
     result = db.session.execute(sql).fetchall()
-
-    # creating the Choropleth Map
 
     custom_colorscale = [
         [0.0, "rgb(220, 201, 155)"],
@@ -286,6 +285,52 @@ def result():
         map_json=map_json,
         total_entries=total_entries,
     )
+
+
+@app.route("/updated_bar_charts", methods=["GET"])
+def updated_bar_charts():
+    clicked_country = request.args.get("clicked_country")
+    print(clicked_country)
+
+    # if a specific country is clicked, filtering by that country
+    sql = text(
+        "SELECT animal, COUNT(*) FROM person "
+        "INNER JOIN countries "
+        "ON person.own_country_id = countries.country_id "
+        "INNER JOIN favorite_animals "
+        "ON person.person_id = favorite_animals.person_id "
+        "INNER JOIN animals "
+        "ON favorite_animals.favorite_animal_id = animals.animal_id "
+        "WHERE country = :clicked_country "
+        "GROUP BY animal "
+        "ORDER BY count(*) DESC "
+        "LIMIT 5"
+    )
+    result = db.session.execute(sql, {"clicked_country": clicked_country}).fetchall()
+
+    # processing the data
+    favorite_animal = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    # creating the graph using Plotly
+    graph_data = [
+        go.Bar(x=favorite_animal, y=total, marker=dict(color="rgb(69, 147, 165)"))
+    ]
+
+    graph_layout = go.Layout(
+        title="Favorite animals TOP 5",
+        xaxis=dict(title="Animal"),
+        yaxis=dict(title="Total"),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
+    )
+    graph_figure_animal = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_animal = json.dumps(
+        graph_figure_animal, cls=plotly.utils.PlotlyJSONEncoder
+    )
+
+    # returning the updated data as JSON using jsonify()
+    return jsonify(graph_json_animal)
 
 
 if __name__ == "__main__":

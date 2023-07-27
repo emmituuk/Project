@@ -6,8 +6,8 @@
   <body>
     <h1>Results</h1>
     <div>Total entries: {{ total_entries }}</div>
-    <div id="bar-graph-animal" class="chart"></div>
     <div id="bar-graph-country" class="chart"></div>
+    <div id="bar-graph-animal" class="chart"></div>
     <div id="choropleth-map" class="chart"></div>
   </body>
 
@@ -23,4 +23,21 @@
     Plotly.newPlot('choropleth-map', mapJason.data, mapJason.layout)
   </script> 
 
+  <script>
+    const map = document.getElementById('choropleth-map');
+    map.on('plotly_click', function(data){
+      const clicked_country = data.points[0].location;
+      fetch("/updated_bar_charts?clicked_country=" + clicked_country)
+      .then((response) => response.json())
+      .then((data) => {
+        // parsing the JSON data received from the response
+        const graphJson = JSON.parse(data);
+        // updating the bar chart with the new data and layout
+        Plotly.newPlot("bar-graph-animal", graphJson.data, graphJson.layout);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    });
+  </script>
 </html>
