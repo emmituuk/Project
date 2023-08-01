@@ -303,7 +303,7 @@ def updated_bar_charts():
         "ON favorite_animals.favorite_animal_id = animals.animal_id "
         "WHERE country = :clicked_country "
         "GROUP BY animal "
-        "ORDER BY count(*) DESC "
+        "ORDER BY COUNT(*) DESC "
         "LIMIT 5"
     )
     result = db.session.execute(sql, {"clicked_country": clicked_country}).fetchall()
@@ -329,8 +329,49 @@ def updated_bar_charts():
         graph_figure_animal, cls=plotly.utils.PlotlyJSONEncoder
     )
 
+    # if a specific country is clicked, filtering by that country - favorite countries
+
+    sql = text(
+        "SELECT fc.country, COUNT(*) "
+        "FROM favorite_countries "
+        "INNER JOIN countries AS fc ON favorite_countries.favorite_country_id = fc.country_id "
+        "INNER JOIN person ON favorite_countries.person_id = person.person_id "
+        "INNER JOIN countries AS oc ON person.own_country_id = oc.country_id "
+        "WHERE oc.country = :clicked_country "
+        "GROUP BY fc.country "
+        "ORDER BY COUNT(*) DESC "
+        "LIMIT 5"
+    )
+    result = db.session.execute(sql, {"clicked_country": clicked_country}).fetchall()
+
+    # processing the data
+    favorite_country = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    # creating the graph using Plotly
+    graph_data = [
+        go.Bar(x=favorite_country, y=total, marker=dict(color="rgb(69, 147, 165)"))
+    ]
+
+    graph_layout = go.Layout(
+        title="Favorite countries TOP 5",
+        xaxis=dict(title="Country"),
+        yaxis=dict(title="Total"),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
+    )
+    graph_figure_country = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_country = json.dumps(
+        graph_figure_country, cls=plotly.utils.PlotlyJSONEncoder
+    )
+
+    graph_data = {
+        "animal_chart": graph_json_animal,
+        "country_chart": graph_json_country,
+    }
+
     # returning the updated data as JSON using jsonify()
-    return jsonify(graph_json_animal)
+    return jsonify(graph_data)
 
 
 if __name__ == "__main__":

@@ -77,9 +77,12 @@
       .then((response) => response.json())
       .then((data) => {
         // parsing the JSON data received from the response
-        const graphJson = JSON.parse(data);
+        const graphJsonAnimal = JSON.parse(data.animal_chart);
+        const graphJsonCountry = JSON.parse(data.country_chart);
+
         // updating the bar chart with the new data and layout
-        Plotly.newPlot("bar-graph-animal", graphJson.data, graphJson.layout);
+        Plotly.newPlot("bar-graph-animal", graphJsonAnimal.data, graphJsonAnimal.layout);
+        Plotly.newPlot("bar-graph-country", graphJsonCountry.data, graphJsonCountry.layout);
         
         // add the marker for the clicked country and remove the marker for the previous country
         addMarkerForCountry(clicked_country);
@@ -91,8 +94,8 @@
           }
         }
 
-      // updating the choropleth map
-      Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
+        // updating the choropleth map
+        Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
 
         // storing the clicked country for reference
         lastClickedCountry = clicked_country;
@@ -103,7 +106,8 @@
     });
     // rejects the clicked country filter and resets bar charts to its orginal values
     function resetCharts() {
-      Plotly.newPlot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout)
+      Plotly.newPlot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout);
+      Plotly.newPlot("bar-graph-country", graphJson_country.data, graphJson_country.layout);
     }
   </script>
 </html>
