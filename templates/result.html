@@ -6,27 +6,73 @@
   <body>
     <h1>Results</h1>
     <div>Total entries: {{ total_entries }}</div>
+    <div id="choropleth-map" class="chart"></div>
     <div id="bar-graph-country" class="chart"></div>
     <div id="bar-graph-animal" class="chart"></div>
-    <div id="choropleth-map" class="chart"></div>
+    <button onclick="resetCharts()">Reset Charts</button>
   </body>
 
   <script type="text/javascript">
     // IMPORTANT! Do not use "", only '' e.g. JSON.parse('{{graph_json|safe}}')
-    var graphJson = JSON.parse('{{ graph_json_animal|safe }}');
-    Plotly.plot("bar-graph-animal", graphJson.data, graphJson.layout);
+    var graphJson_animal = JSON.parse('{{ graph_json_animal|safe }}');
+    Plotly.plot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout);
 
-    var graphJson = JSON.parse('{{ graph_json_country|safe }}');
-    Plotly.plot("bar-graph-country", graphJson.data, graphJson.layout);
+    var graphJson_country = JSON.parse('{{ graph_json_country|safe }}');
+    Plotly.plot("bar-graph-country", graphJson_country.data, graphJson_country.layout);
 
     var mapJason = JSON.parse('{{ map_json|safe }}');
-    Plotly.newPlot('choropleth-map', mapJason.data, mapJason.layout)
-  </script> 
+    Plotly.newPlot('choropleth-map', mapJason.data, mapJason.layout);
 
-  <script>
+    // variable to store the last clicked country
+    let lastClickedCountry = null;
+
+    // function to add a marker for the clicked country
+    function addMarkerForCountry(countryName) {
+      // check if a marker already exists for the clicked country
+      const existingMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === countryName);
+
+      if (existingMarkerIndex === -1) {
+        // if a marker doesn't exist, add a new marker for the clicked country
+        mapJason.data.push({
+          colorscale: [[0, 'rgba(0, 0, 0, 0)'], [1, 'rgba(0, 0, 0, 0)']],
+          locationmode: "country names",
+          locations: [countryName],
+          type: "choropleth",
+          marker: { line: { color: "Red", width: 2 } },
+          showscale: false,
+          z: [0],
+          text: [countryName],
+          hoverinfo: "text",
+        });
+      } else {
+      // if a marker already exists, update its properties to highlight the selected country
+      mapJason.data[existingMarkerIndex].marker = { line: { color: "Red", width: 2 } };
+      mapJason.data[existingMarkerIndex].z = [0];
+      }
+    }
+
     const map = document.getElementById('choropleth-map');
-    map.on('plotly_click', function(data){
+    map.on('plotly_click', function(data) {
       const clicked_country = data.points[0].location;
+
+      // check if the same country is clicked again
+      if (clicked_country === lastClickedCountry) {
+
+        // reset the marker
+        const previousMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === lastClickedCountry);
+        if (previousMarkerIndex !== -1) {
+          mapJason.data[previousMarkerIndex].marker = { line: { color: "rgba(0, 0, 0, 0)", width: 2 } };
+          mapJason.data[previousMarkerIndex].z = [null];
+        }
+        Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
+
+        // reset the charts
+        resetCharts();
+
+        lastClickedCountry = null;
+        return;
+      }
+
       fetch("/updated_bar_charts?clicked_country=" + clicked_country)
       .then((response) => response.json())
       .then((data) => {
@@ -34,10 +80,30 @@
         const graphJson = JSON.parse(data);
         // updating the bar chart with the new data and layout
         Plotly.newPlot("bar-graph-animal", graphJson.data, graphJson.layout);
+        
+        // add the marker for the clicked country and remove the marker for the previous country
+        addMarkerForCountry(clicked_country);
+        if (lastClickedCountry) {
+          const previousMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === lastClickedCountry);
+          if (previousMarkerIndex !== -1) {
+            mapJason.data[previousMarkerIndex].marker = { line: { color: "rgba(0, 0, 0, 0)", width: 2 } };
+            mapJason.data[previousMarkerIndex].z = [null];
+          }
+        }
+
+      // updating the choropleth map
+      Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
+
+        // storing the clicked country for reference
+        lastClickedCountry = clicked_country;
       })
       .catch((error) => {
         console.error("Error:", error);
       });
     });
+    // rejects the clicked country filter and resets bar charts to its orginal values
+    function resetCharts() {
+      Plotly.newPlot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout)
+    }
   </script>
 </html>

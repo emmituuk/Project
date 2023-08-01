@@ -263,8 +263,9 @@ def result():
         z=[row[1] for row in result],
         locationmode="country names",
         colorscale=custom_colorscale,
-        # best colour:YlGnBu,YlOrRd, Earth
         colorbar=dict(title="Number of People"),
+        text=[row[0] for row in result],
+        hoverinfo="text",
     )
     layout = go.Layout(
         title="Geographic Distribution of Favorite Entries",
@@ -290,9 +291,8 @@ def result():
 @app.route("/updated_bar_charts", methods=["GET"])
 def updated_bar_charts():
     clicked_country = request.args.get("clicked_country")
-    print(clicked_country)
 
-    # if a specific country is clicked, filtering by that country
+    # if a specific country is clicked, filtering by that country - favorite animals
     sql = text(
         "SELECT animal, COUNT(*) FROM person "
         "INNER JOIN countries "
