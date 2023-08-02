@@ -320,7 +320,10 @@ def updated_bar_charts():
     graph_layout = go.Layout(
         title="Favorite animals TOP 5",
         xaxis=dict(title="Animal"),
-        yaxis=dict(title="Total"),
+        yaxis=dict(
+            title="Total",
+            tickvals=list(range(0, max(total) + 1)),
+        ),
         plot_bgcolor="rgba(220, 201, 155, 0.17)",
     )
     graph_figure_animal = go.Figure(data=graph_data, layout=graph_layout)
@@ -350,13 +353,20 @@ def updated_bar_charts():
 
     # creating the graph using Plotly
     graph_data = [
-        go.Bar(x=favorite_country, y=total, marker=dict(color="rgb(69, 147, 165)"))
+        go.Bar(
+            x=favorite_country,
+            y=total,
+            marker=dict(color="rgb(69, 147, 165)"),
+        )
     ]
 
     graph_layout = go.Layout(
         title="Favorite countries TOP 5",
         xaxis=dict(title="Country"),
-        yaxis=dict(title="Total"),
+        yaxis=dict(
+            title="Total",
+            tickvals=list(range(0, max(total) + 1)),
+        ),
         plot_bgcolor="rgba(220, 201, 155, 0.17)",
     )
     graph_figure_country = go.Figure(data=graph_data, layout=graph_layout)
@@ -365,9 +375,23 @@ def updated_bar_charts():
         graph_figure_country, cls=plotly.utils.PlotlyJSONEncoder
     )
 
+    # total entries from the clicked country
+    sql = text(
+        "SELECT COUNT(*) FROM person "
+        "INNER JOIN countries "
+        "ON person.own_country_id = countries.country_id "
+        "INNER JOIN favorite_animals "
+        "ON person.person_id = favorite_animals.person_id "
+        "WHERE country = :clicked_country "
+    )
+    total_entries = db.session.execute(
+        sql, {"clicked_country": clicked_country}
+    ).fetchone()[0]
+
     graph_data = {
         "animal_chart": graph_json_animal,
         "country_chart": graph_json_country,
+        "clicked_country_entries": total_entries,
     }
 
     # returning the updated data as JSON using jsonify()

@@ -6,22 +6,37 @@
   <body>
     <h1>Results</h1>
     <div>Total entries: {{ total_entries }}</div>
+    <div>
+      Please select a country on the map and see what are the favorites of the inhabitants of that country. <br>
+    </div>
+    <div id="clicked_country_result" style="display: none;">
+      You selected: <span id="clicked_country"></span><br>
+      Total entries of the selected country: <span id="clicked_country_entries"></span><br>
+    </div>
+    <button onclick="resetCharts()">Reset Charts</button>
     <div id="choropleth-map" class="chart"></div>
     <div id="bar-graph-country" class="chart"></div>
     <div id="bar-graph-animal" class="chart"></div>
-    <button onclick="resetCharts()">Reset Charts</button>
   </body>
 
   <script type="text/javascript">
     // IMPORTANT! Do not use "", only '' e.g. JSON.parse('{{graph_json|safe}}')
     var graphJson_animal = JSON.parse('{{ graph_json_animal|safe }}');
-    Plotly.plot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout);
+    Plotly.plot(
+      "bar-graph-animal",
+      graphJson_animal.data,
+      graphJson_animal.layout
+    );
 
     var graphJson_country = JSON.parse('{{ graph_json_country|safe }}');
-    Plotly.plot("bar-graph-country", graphJson_country.data, graphJson_country.layout);
+    Plotly.plot(
+      "bar-graph-country",
+      graphJson_country.data,
+      graphJson_country.layout
+    );
 
     var mapJason = JSON.parse('{{ map_json|safe }}');
-    Plotly.newPlot('choropleth-map', mapJason.data, mapJason.layout);
+    Plotly.newPlot("choropleth-map", mapJason.data, mapJason.layout);
 
     // variable to store the last clicked country
     let lastClickedCountry = null;
@@ -29,12 +44,17 @@
     // function to add a marker for the clicked country
     function addMarkerForCountry(countryName) {
       // check if a marker already exists for the clicked country
-      const existingMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === countryName);
+      const existingMarkerIndex = mapJason.data.findIndex(
+        (data) => data.locations[0] === countryName
+      );
 
       if (existingMarkerIndex === -1) {
         // if a marker doesn't exist, add a new marker for the clicked country
         mapJason.data.push({
-          colorscale: [[0, 'rgba(0, 0, 0, 0)'], [1, 'rgba(0, 0, 0, 0)']],
+          colorscale: [
+            [0, "rgba(0, 0, 0, 0)"],
+            [1, "rgba(0, 0, 0, 0)"],
+          ],
           locationmode: "country names",
           locations: [countryName],
           type: "choropleth",
@@ -45,69 +65,114 @@
           hoverinfo: "text",
         });
       } else {
-      // if a marker already exists, update its properties to highlight the selected country
-      mapJason.data[existingMarkerIndex].marker = { line: { color: "Red", width: 2 } };
-      mapJason.data[existingMarkerIndex].z = [0];
+        // if a marker already exists, update its properties to highlight the selected country
+        mapJason.data[existingMarkerIndex].marker = {
+          line: { color: "Red", width: 2 },
+        };
+        mapJason.data[existingMarkerIndex].z = [0];
       }
     }
 
-    const map = document.getElementById('choropleth-map');
-    map.on('plotly_click', function(data) {
+    function removeMarkerForCountry(countryName) {
+      const previousMarkerIndex = mapJason.data.findIndex(
+        (data) => data.locations[0] === countryName
+      );
+      if (previousMarkerIndex !== -1) {
+        mapJason.data[previousMarkerIndex].marker = {
+          line: { color: "rgba(0, 0, 0, 0)", width: 2 },
+        };
+        mapJason.data[previousMarkerIndex].z = [null];
+      }
+    }
+
+    const map = document.getElementById("choropleth-map");
+    map.on("plotly_click", function (data) {
       const clicked_country = data.points[0].location;
 
-      // check if the same country is clicked again
+      // show the clicked_country_result div when click some country
+      document.getElementById('clicked_country_result').style.display = 'block';
+
+      // update the clicked country name in the HTML
+      document.getElementById('clicked_country').textContent = clicked_country;
+
+      // check if the same country is clicked again, reset charts and map marker
       if (clicked_country === lastClickedCountry) {
-
-        // reset the marker
-        const previousMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === lastClickedCountry);
-        if (previousMarkerIndex !== -1) {
-          mapJason.data[previousMarkerIndex].marker = { line: { color: "rgba(0, 0, 0, 0)", width: 2 } };
-          mapJason.data[previousMarkerIndex].z = [null];
-        }
-        Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
-
-        // reset the charts
         resetCharts();
-
-        lastClickedCountry = null;
         return;
       }
 
       fetch("/updated_bar_charts?clicked_country=" + clicked_country)
-      .then((response) => response.json())
-      .then((data) => {
-        // parsing the JSON data received from the response
-        const graphJsonAnimal = JSON.parse(data.animal_chart);
-        const graphJsonCountry = JSON.parse(data.country_chart);
+        .then((response) => response.json())
+        .then((data) => {
+          // parsing the JSON data received from the response
+          const graphJsonAnimal = JSON.parse(data.animal_chart);
+          const graphJsonCountry = JSON.parse(data.country_chart);
+          const clickedCountryEntries = JSON.parse(data.clicked_country_entries);
 
-        // updating the bar chart with the new data and layout
-        Plotly.newPlot("bar-graph-animal", graphJsonAnimal.data, graphJsonAnimal.layout);
-        Plotly.newPlot("bar-graph-country", graphJsonCountry.data, graphJsonCountry.layout);
-        
-        // add the marker for the clicked country and remove the marker for the previous country
-        addMarkerForCountry(clicked_country);
-        if (lastClickedCountry) {
-          const previousMarkerIndex = mapJason.data.findIndex((data) => data.locations[0] === lastClickedCountry);
-          if (previousMarkerIndex !== -1) {
-            mapJason.data[previousMarkerIndex].marker = { line: { color: "rgba(0, 0, 0, 0)", width: 2 } };
-            mapJason.data[previousMarkerIndex].z = [null];
+          // total entries from the clicked country
+          document.getElementById('clicked_country_entries').textContent = clickedCountryEntries;
+
+          // updating the bar chart with the new data and layout
+          Plotly.newPlot(
+            "bar-graph-animal",
+            graphJsonAnimal.data,
+            graphJsonAnimal.layout
+          );
+          Plotly.newPlot(
+            "bar-graph-country",
+            graphJsonCountry.data,
+            graphJsonCountry.layout
+          );
+
+          // add the marker for the clicked country
+          addMarkerForCountry(clicked_country);
+
+          // remove marker for the previous country
+          if (lastClickedCountry) {
+            const previousMarkerIndex = mapJason.data.findIndex(
+              (data) => data.locations[0] === lastClickedCountry
+            );
+            if (previousMarkerIndex !== -1) {
+              mapJason.data[previousMarkerIndex].marker = {
+                line: { color: "rgba(0, 0, 0, 0)", width: 2 },
+              };
+              mapJason.data[previousMarkerIndex].z = [null];
+            }
           }
-        }
+          // updating the choropleth map
+          Plotly.update("choropleth-map", mapJason.data, mapJason.layout);
 
-        // updating the choropleth map
-        Plotly.update('choropleth-map', mapJason.data, mapJason.layout);
-
-        // storing the clicked country for reference
-        lastClickedCountry = clicked_country;
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+          // storing the clicked country for reference
+          lastClickedCountry = clicked_country;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
     });
-    // rejects the clicked country filter and resets bar charts to its orginal values
+
+    // function to reset charts, marker and the clicked_country_result div
     function resetCharts() {
-      Plotly.newPlot("bar-graph-animal", graphJson_animal.data, graphJson_animal.layout);
-      Plotly.newPlot("bar-graph-country", graphJson_country.data, graphJson_country.layout);
+      // reset charts
+      Plotly.newPlot(
+        "bar-graph-animal",
+        graphJson_animal.data,
+        graphJson_animal.layout
+      );
+      Plotly.newPlot(
+        "bar-graph-country",
+        graphJson_country.data,
+        graphJson_country.layout
+      );
+
+      // reset marker around the clicked country
+      if (lastClickedCountry) {
+        removeMarkerForCountry(lastClickedCountry);
+        Plotly.update("choropleth-map", mapJason.data, mapJason.layout);
+      }
+      lastClickedCountry = null;
+
+      // hide the clicked_country_result div
+      document.getElementById('clicked_country_result').style.display = 'None';
     }
   </script>
 </html>
