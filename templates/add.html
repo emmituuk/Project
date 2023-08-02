@@ -5,6 +5,10 @@
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.3/purify.min.js"></script>
   </head>
   <body>
@@ -142,7 +146,7 @@
           </div>
           <br />
           <div class="text-center">
-            <button type="submit" class="btn btn-primary" value="Send">
+            <button type="submit" class="custom-button" value="Send">
               Submit form
             </button>
           </div>

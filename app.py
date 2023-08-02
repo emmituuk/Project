@@ -263,7 +263,8 @@ def result():
         z=[row[1] for row in result],
         locationmode="country names",
         colorscale=custom_colorscale,
-        colorbar=dict(title="Number of People"),
+        colorbar_title="Number of Entries",
+        colorbar=dict(x=-0.2, y=0.54),
         text=[row[0] for row in result],
         hoverinfo="text",
     )

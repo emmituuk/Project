@@ -2,21 +2,50 @@
   <head>
     <title>Result</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    />
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='styles.css') }}"
+  />
   </head>
   <body>
-    <h1>Results</h1>
-    <div>Total entries: {{ total_entries }}</div>
-    <div>
-      Please select a country on the map and see what are the favorites of the inhabitants of that country. <br>
+    <div class="container">
+      <div class="row text-center">
+        <h1>Results</h1>
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-8">
+          <div id="choropleth-map" class="chart"></div>
+        </div>
+        <div class="col-6 col-md-4">
+          <br><br><br>
+          <div class="card card-custom text-center" style="padding: 20px;">
+            <h1 style="font-size: larger;">Total entries: {{ total_entries }}</h1>
+            <br>
+            <p style="font-size: medium;">
+              Please select a country on the map and see what are the favorites of the inhabitants of that country.
+            </p>
+            <div id="clicked_country_result" style="display: none;">
+              You selected: <b><span id="clicked_country"></span></b><br>
+              Total entries of the selected country: <b><span id="clicked_country_entries"></span></b>
+              <br><br>
+              <button type="button" onclick="resetCharts() " class="custom-button">Reset Charts</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-6">
+          <div id="bar-graph-country" class="chart"></div>
+        </div>
+        <div class="col-6">
+          <div id="bar-graph-animal" class="chart"></div>
+        </div>
+      </div>
     </div>
-    <div id="clicked_country_result" style="display: none;">
-      You selected: <span id="clicked_country"></span><br>
-      Total entries of the selected country: <span id="clicked_country_entries"></span><br>
-    </div>
-    <button onclick="resetCharts()">Reset Charts</button>
-    <div id="choropleth-map" class="chart"></div>
-    <div id="bar-graph-country" class="chart"></div>
-    <div id="bar-graph-animal" class="chart"></div>
   </body>
 
   <script type="text/javascript">

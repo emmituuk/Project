@@ -1,0 +1,35 @@
+/* style for each button */
+.custom-button {
+    background-color: #4593a5;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .custom-button:focus{
+    background-color: #4593a5;
+    color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(69, 147, 165, 0.5);
+  }
+  .custom-button:active {
+    background-color: #285660;
+    color: #fff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(69, 147, 165, 0.5);
+  } 
+  .custom-button:hover {
+    background-color: #285660;
+    color: #fff;
+  }
+
+  /* Style for result.html card */
+  .card-custom {
+    height: 80%;
+  }
+  @media (max-width: 576px) {
+    .card-custom {
+      height: auto;
+    }
+  }
