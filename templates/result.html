@@ -12,10 +12,11 @@
   />
   </head>
   <body>
+    <div class="jumbotron custom-jumbotron">
+      <h1 class="display-4">Results</h1>
+      <hr class="my-4" />
+    </div>
     <div class="container">
-      <div class="row text-center">
-        <h1>Results</h1>
-      </div>
       <div class="row">
         <div class="col-12 col-md-8">
           <div id="choropleth-map" class="chart"></div>
@@ -45,6 +46,11 @@
           <div id="bar-graph-animal" class="chart"></div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-12">
+            <div id="line-chart" class="chart"></div>
+        </div>
+      </div>
     </div>
   </body>
 
@@ -66,6 +72,9 @@
 
     var mapJason = JSON.parse('{{ map_json|safe }}');
     Plotly.newPlot("choropleth-map", mapJason.data, mapJason.layout);
+
+    var graphJason_line = JSON.parse('{{ graph_json_line|safe }}');
+    Plotly.plot('line-chart', graphJason_line.data, graphJason_line.layout);
 
     // variable to store the last clicked country
     let lastClickedCountry = null;
@@ -137,6 +146,7 @@
           const graphJsonAnimal = JSON.parse(data.animal_chart);
           const graphJsonCountry = JSON.parse(data.country_chart);
           const clickedCountryEntries = JSON.parse(data.clicked_country_entries);
+          const graphJsonLine = JSON.parse(data.line_chart);
 
           // total entries from the clicked country
           document.getElementById('clicked_country_entries').textContent = clickedCountryEntries;
@@ -151,6 +161,12 @@
             "bar-graph-country",
             graphJsonCountry.data,
             graphJsonCountry.layout
+          );
+
+          Plotly.newPlot(
+            "line-chart",
+            graphJsonLine.data,
+            graphJsonLine.layout
           );
 
           // add the marker for the clicked country
@@ -191,6 +207,10 @@
         "bar-graph-country",
         graphJson_country.data,
         graphJson_country.layout
+      );
+      Plotly.newPlot("line-chart", 
+        graphJason_line.data, 
+        graphJason_line.layout
       );
 
       // reset marker around the clicked country

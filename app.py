@@ -8,6 +8,7 @@ from livereload import Server
 import json
 import plotly
 import plotly.graph_objs as go
+import pandas as pd
 
 from functions import move_to_end, is_valid_animal_id, is_valid_country_id
 from error_handlers import (
@@ -279,6 +280,36 @@ def result():
     sql = text("SELECT COUNT(*) FROM favorite_animals")
     total_entries = db.session.execute(sql).fetchone()[0]
 
+    # values and creating the line chart, how many values added per day
+    sql = text(
+        "SELECT DATE(created_on), COUNT(*) FROM favorite_animals "
+        "GROUP BY DATE(created_on) "
+        "ORDER BY DATE(created_on)"
+    )
+
+    result = db.session.execute(sql).fetchall()
+    date = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    graph_data = [
+        go.Scatter(
+            x=date,
+            y=total,
+            mode="lines+markers",
+            marker=dict(color="rgb(69, 147, 165)"),
+        )
+    ]
+
+    graph_layout = go.Layout(
+        title="Number of Entries per day",
+        xaxis=dict(title="Date"),
+        yaxis=dict(title="Total"),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
+    )
+    graph_figure_line = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_line = json.dumps(graph_figure_line, cls=plotly.utils.PlotlyJSONEncoder)
+
     # using render_template to pass graphJSONs to html
     return render_template(
         "result.html",
@@ -286,6 +317,7 @@ def result():
         graph_json_country=graph_json_country,
         map_json=map_json,
         total_entries=total_entries,
+        graph_json_line=graph_json_line,
     )
 
 
@@ -376,6 +408,66 @@ def updated_bar_charts():
         graph_figure_country, cls=plotly.utils.PlotlyJSONEncoder
     )
 
+    # if a specific country is clicked, filtering by that country - line chart
+    sql = text(
+        "SELECT DATE(favorite_animals.created_on) AS d, COUNT(*) "
+        "FROM favorite_animals "
+        "INNER JOIN person ON favorite_animals.person_id = person.person_id "
+        "INNER JOIN countries ON person.own_country_id = countries.country_id "
+        "WHERE country = :clicked_country "
+        "GROUP BY d "
+        "ORDER BY d "
+    )
+    result = db.session.execute(sql, {"clicked_country": clicked_country}).fetchall()
+
+    dates = [row[0] for row in result]
+    total = [row[1] for row in result]
+
+    graph_data = [
+        go.Scatter(
+            x=dates,
+            y=total,
+            mode="lines+markers",
+            marker=dict(color="rgb(69, 147, 165)"),
+        )
+    ]
+
+    # x-axis: making tickvals and text 'MMM DD' to the layout of the line chart
+    first_date = pd.to_datetime(min(dates))
+    last_date = pd.to_datetime(max(dates))
+    num_unique_dates = len(set(dates))
+
+    date_difference = (last_date - first_date).days
+
+    if num_unique_dates == 2 and date_difference == 1:
+        # if only two different dates next to each other, show every day
+        date_range = pd.date_range(start=first_date, end=last_date, freq="D")
+    else:
+        date_range = pd.date_range(start=first_date, end=last_date, freq="2D")
+
+    formatted_dates = [date.strftime("%b %d") for date in date_range]
+
+    # y-axis: making ticvals
+    min_total = min(total)
+    max_total = max(total)
+    total_range = range(min_total, max_total + 1)
+
+    graph_layout = go.Layout(
+        title="Number of Entries per day",
+        xaxis=dict(
+            title="Date", tickvals=date_range, ticktext=formatted_dates, tickangle=45
+        ),
+        yaxis=dict(
+            title="Total",
+            tickvals=list(total_range),
+            tickformat="d",
+        ),
+        plot_bgcolor="rgba(220, 201, 155, 0.17)",
+    )
+    graph_figure_line = go.Figure(data=graph_data, layout=graph_layout)
+
+    graph_json_line = json.dumps(graph_figure_line, cls=plotly.utils.PlotlyJSONEncoder)
+
     # total entries from the clicked country
     sql = text(
         "SELECT COUNT(*) FROM person "
@@ -393,6 +485,7 @@ def updated_bar_charts():
         "animal_chart": graph_json_animal,
         "country_chart": graph_json_country,
         "clicked_country_entries": total_entries,
+        "line_chart": graph_json_line,
     }
 
     # returning the updated data as JSON using jsonify()
