@@ -59,9 +59,7 @@ def check_email_availability():
 
 @app.route("/")
 def index():
-    sql = text("SELECT person_id FROM favorite_animals")
-    result = db.session.execute(sql).fetchall()
-    return render_template("index.html", count=len(result))
+    return render_template("index.html")
 
 
 @app.route("/add")
