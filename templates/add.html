@@ -154,27 +154,8 @@
       </div>
     </div>
     <br />
-
+    <script src="static/js/form_validation.js"></script>
     <script>
-      // DOMPurify - sanitizes HTML and prevents XSS attacks
-      function sanitizeUserInput(inputElement) {
-        inputElement.value = DOMPurify.sanitize(inputElement.value);
-      }
-
-      // call the sanitizeUserInput() function on 'input' event of each form field
-      const formFields = [
-        document.getElementById("first_name"),
-        document.getElementById("last_name"),
-        document.getElementById("email"),
-        document.getElementById("other_animal"),
-      ];
-
-      formFields.forEach((field) => {
-        field.addEventListener("input", function () {
-          sanitizeUserInput(field);
-        });
-      });
-
       // if selected 'Other' then show the input
       document
         .getElementById("favorite_animal_id")
@@ -184,6 +165,7 @@
           var otherAnimal = document.getElementById("other_animal");
           // the Flask data in JavaScript
           var other_id_animals = "{{ other_id_animals}}";
+
           if (selectedAnimal === other_id_animals) {
             otherInput.style.display = "block";
             otherAnimal.setAttribute("required", "true");
@@ -192,75 +174,6 @@
             otherAnimal.removeAttribute("required");
           }
         });
-
-      // email validation
-      function validateEmailFormat(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-      }
-
-      function checkEmailAvailability() {
-        const emailInput = document.getElementById("email");
-        const email = emailInput.value.trim();
-
-        if (validateEmailFormat(email)) {
-          fetch("/check_email_availability", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email: email }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.available) {
-                emailInput.setCustomValidity("");
-              } else {
-                emailInput.setCustomValidity("This email is already used.");
-                document.getElementById("emailFeedback").textContent =
-                  "This email address has already been used to submit information. You can add information only once with one email address.";
-              }
-            })
-            .catch((error) => {
-              console.error("Error checking email availability:", error);
-            });
-        } else {
-          emailInput.setCustomValidity("Please enter a valid email address.");
-          document.getElementById("emailFeedback").textContent =
-            "Please enter a valid email address in the format name@example.com.";
-        }
-      }
-      document
-        .getElementById("email")
-        .addEventListener("input", checkEmailAvailability);
-
-      // validation for others
-      (function () {
-        "use strict";
-        window.addEventListener(
-          "load",
-          function () {
-            var forms = document.getElementsByClassName("needs-validation");
-            var validation = Array.prototype.filter.call(
-              forms,
-              function (form) {
-                form.addEventListener(
-                  "submit",
-                  function (event) {
-                    if (form.checkValidity() === false) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    form.classList.add("was-validated");
-                  },
-                  false
-                );
-              }
-            );
-          },
-          false
-        );
-      })();
     </script>
   </body>
 </html>
