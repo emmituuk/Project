@@ -3,15 +3,9 @@ from models import db
 
 # moves a list element to the end of the list, required in the drop-down/select menu - used add.py
 def move_to_end(lst, elem):
-    new_lst = []
-    temp = None
-    for i in lst:
-        if i != elem:
-            new_lst.append(i)
-        else:
-            temp = i
-    new_lst.append(temp)
-    return new_lst
+    lst.remove(elem)
+    lst.append(elem)
+    return lst
 
 
 # function for validating animal ID - used send.py
