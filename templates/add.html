@@ -160,13 +160,12 @@
       document
         .getElementById("favorite_animal_id")
         .addEventListener("change", function () {
-          var selectedAnimal = this.value;
-          var otherInput = document.getElementById("other_input");
-          var otherAnimal = document.getElementById("other_animal");
-          // the Flask data in JavaScript
-          var other_id_animals = "{{ other_id_animals}}";
+          const selectedAnimal = this.value;
+          const otherInput = document.getElementById("other_input");
+          const otherAnimal = document.getElementById("other_animal");
+          const otherIdAnimals = "{{ other_id_animals}}";
 
-          if (selectedAnimal === other_id_animals) {
+          if (selectedAnimal === otherIdAnimals) {
             otherInput.style.display = "block";
             otherAnimal.setAttribute("required", "true");
           } else {

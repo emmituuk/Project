@@ -32,7 +32,7 @@ def create_bar_graph(sql, x_label, y_label, graph_title, filter_data=None):
 def create_line_chart(sql, x_label, y_label, graph_title, filter_data=None):
     if filter_data:
         result = db.session.execute(sql, filter_data).fetchall()
-        # modified axis settings for filtered data
+        # customized axis settings for filtered data
         dates = [row[0] for row in result]
         total = [row[1] for row in result]
 

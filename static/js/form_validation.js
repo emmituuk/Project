@@ -8,15 +8,21 @@ const formFields = [
   document.getElementById("other_animal"),
 ];
 
+// function to sanitize input using DOMPurify
+function sanitizeInput() {
+  const field = this;
+  field.value = DOMPurify.sanitize(field.value);
+}
+
 formFields.forEach((field) => {
-  field.addEventListener("input", function () {
-    field.value = DOMPurify.sanitize(field.value);
-  });
+  field.addEventListener("input", sanitizeInput);
 });
+
+const emailInput = document.getElementById("email");
+emailInput.addEventListener("input", checkEmailAvailability);
 
 // email validation and check if email is unique
 function checkEmailAvailability() {
-  const emailInput = document.getElementById("email");
   const email = emailInput.value.trim();
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -47,9 +53,6 @@ function checkEmailAvailability() {
       "Please enter a valid email address in the format name@example.com.";
   }
 }
-document
-  .getElementById("email")
-  .addEventListener("input", checkEmailAvailability);
 
 // validation for others
 (function () {
@@ -58,7 +61,7 @@ document
     "load",
     function () {
       var forms = document.getElementsByClassName("needs-validation");
-      var validation = Array.prototype.filter.call(forms, function (form) {
+      Array.prototype.filter.call(forms, function (form) {
         form.addEventListener(
           "submit",
           function (event) {
