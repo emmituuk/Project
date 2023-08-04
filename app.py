@@ -10,19 +10,7 @@ from blueprints.add import add_bp
 from blueprints.result import result_bp
 from blueprints.updated_graphs import updated_graphs_bp
 
-from error_handlers import (
-    bad_request,
-    unauthorized,
-    forbidden,
-    page_not_found,
-    conflict,
-    precondition_failed,
-    too_many_requests,
-    internal_server_error,
-    bad_gateway,
-    service_unavailable,
-    gateway_timeout,
-)
+from error_handlers import render_error
 
 app = Flask(__name__)
 app.debug = True
@@ -31,17 +19,17 @@ app.config.update(TEMPLATES_AUTO_RELOAD=True)
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
 db.init_app(app)
 
-app.register_error_handler(400, bad_request)
-app.register_error_handler(401, unauthorized)
-app.register_error_handler(403, forbidden)
-app.register_error_handler(404, page_not_found)
-app.register_error_handler(409, conflict)
-app.register_error_handler(412, precondition_failed)
-app.register_error_handler(429, too_many_requests)
-app.register_error_handler(500, internal_server_error)
-app.register_error_handler(502, bad_gateway)
-app.register_error_handler(503, service_unavailable)
-app.register_error_handler(504, gateway_timeout)
+app.register_error_handler(400, render_error)
+app.register_error_handler(401, render_error)
+app.register_error_handler(403, render_error)
+app.register_error_handler(404, render_error)
+app.register_error_handler(409, render_error)
+app.register_error_handler(412, render_error)
+app.register_error_handler(429, render_error)
+app.register_error_handler(500, render_error)
+app.register_error_handler(502, render_error)
+app.register_error_handler(503, render_error)
+app.register_error_handler(504, render_error)
 
 # register the Blueprints
 app.register_blueprint(send_bp)
