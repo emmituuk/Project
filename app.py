@@ -5,10 +5,10 @@ from os import getenv
 from sqlalchemy.sql import text
 from livereload import Server
 
-from send import send_bp
-from add import add_bp
-from result import result_bp
-from updated_bar_charts import updated_bar_charts_bp
+from blueprints.send import send_bp
+from blueprints.add import add_bp
+from blueprints.result import result_bp
+from blueprints.updated_graphs import updated_graphs_bp
 
 from error_handlers import (
     bad_request,
@@ -47,7 +47,7 @@ app.register_error_handler(504, gateway_timeout)
 app.register_blueprint(send_bp)
 app.register_blueprint(add_bp)
 app.register_blueprint(result_bp)
-app.register_blueprint(updated_bar_charts_bp)
+app.register_blueprint(updated_graphs_bp)
 
 
 @app.route("/")

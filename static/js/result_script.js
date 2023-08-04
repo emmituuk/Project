@@ -63,7 +63,7 @@ map.on("plotly_click", function (data) {
     return;
   }
 
-  fetch("/updated_bar_charts?clicked_country=" + clicked_country)
+  fetch("/updated_graphs?clicked_country=" + clicked_country)
     .then((response) => response.json())
     .then((data) => {
       // parsing the JSON data received from the response
