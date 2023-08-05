@@ -25,16 +25,6 @@
     color: #fff;
   }
 
-  /* style for result.html card */
-  .card-custom {
-    height: 80%;
-  }
-  @media (max-width: 576px) {
-    .card-custom {
-      height: auto;
-    }
-  }
-
 /* style for the jumbotrons */
 .custom-jumbotron {
   background-color: rgba(220, 201, 155, 0.17);
