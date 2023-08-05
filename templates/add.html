@@ -104,8 +104,8 @@
               required
             >
               <option selected disabled value>Select here</option>
-              {% for o in sorted_animals %}
-              <option value="{{ o.animal_id }}">{{ o.animal }}</option>
+              {% for animal_id, animal in sorted_animals %}
+              <option value="{{ animal_id }}">{{ animal }}</option>
               {% endfor %}
             </select>
             <div class="invalid-feedback">
