@@ -13,7 +13,7 @@ from blueprints.updated_graphs import updated_graphs_bp
 from error_handlers import render_error
 
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 app.config.update(TEMPLATES_AUTO_RELOAD=True)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = getenv("DATABASE_URL")
