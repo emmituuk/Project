@@ -112,13 +112,13 @@ def create_choropleth_map(sql, colorbar_title, graph_title):
         locationmode="country names",
         colorscale=custom_colorscale,
         colorbar_title=colorbar_title,
-        colorbar=dict(x=-0.2, y=0.54),
         text=[row[0] for row in result],
         hoverinfo="text",
     )
     layout = go.Layout(
         title=graph_title,
         geo=dict(projection_type="natural earth"),
+        height=400,
     )
     map_figure = go.Figure(data=data, layout=layout)
     return json.dumps(map_figure, cls=plotly.utils.PlotlyJSONEncoder)

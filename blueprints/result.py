@@ -60,7 +60,7 @@ def result():
     map_json = create_choropleth_map(
         sql_map,
         colorbar_title="Number of Entries",
-        graph_title="Geographic Distribution of Favorite Entries",
+        graph_title="Geographic Distribution of Entries",
     )
 
     # fetch and create line chart for number of entries per day
