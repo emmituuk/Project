@@ -43,9 +43,9 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/check_email_availability", methods=["POST"])
+@app.route("/check_email_availability", methods=["GET"])
 def check_email_availability():
-    email = request.json.get("email")
+    email = request.args.get("email")
     sql = text("SELECT email FROM person WHERE email = :email")
     result = db.session.execute(sql, {"email": email}).fetchone()
 

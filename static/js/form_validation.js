@@ -26,12 +26,11 @@ function checkEmailAvailability() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (emailRegex.test(email)) {
-    fetch("/check_email_availability", {
-      method: "POST",
+    fetch(`/check_email_availability?email=${email}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email: email }),
     })
       .then((response) => response.json())
       .then((data) => {
