@@ -1,6 +1,5 @@
 // script for add.html
 
-// DOMPurify - sanitizes HTML and prevents XSS attacks
 const formFields = [
   document.getElementById("first_name"),
   document.getElementById("last_name"),
@@ -8,7 +7,7 @@ const formFields = [
   document.getElementById("other_animal"),
 ];
 
-// function to sanitize input using DOMPurify
+// function to sanitize input using DOMPurify - sanitizes HTML and prevents XSS attacks
 function sanitizeInput() {
   const field = this;
   field.value = DOMPurify.sanitize(field.value);
@@ -55,7 +54,7 @@ function checkEmailAvailability() {
 }
 
 // validation for others
-(function () {
+function validationOthers() {
   "use strict";
   window.addEventListener(
     "load",
@@ -77,4 +76,6 @@ function checkEmailAvailability() {
     },
     false
   );
-})();
+}
+
+validationOthers();
