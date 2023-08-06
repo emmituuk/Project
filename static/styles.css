@@ -25,9 +25,28 @@
     color: #fff;
   }
 
+/* container layout */
+.container {
+  max-width: 1000px;
+  padding: 40;
+}
+
+/* mobile-specific layout */
+@media (max-width: 767px) {
+  .btn-group-mobile {
+    display: block,
+  }
+}
+
 /* style for the jumbotrons */
 .custom-jumbotron {
   background-color: rgba(220, 201, 155, 0.17);
   color: #000;
   padding: 2rem;
+}
+
+/* add hyphenation to link text */
+a {
+  word-wrap: break-word;
+  hyphens: auto;
 }
