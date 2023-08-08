@@ -1,8 +1,8 @@
 <html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="author" content="Emmi Kivivuori">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="author" content="Emmi Kivivuori" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Your favorites</title>
     <link
       rel="stylesheet"
@@ -23,137 +23,144 @@
       </p>
       <hr class="my-4" />
       <p>
-        <b>Warning!</b> Please do not enter your real personal information.
-        This is an example.
+        <b>Warning!</b> Please do not enter your real personal information. This
+        is an example.
       </p>
     </div>
-    <div class="card mx-auto shadow border" style="width: 40rem; padding: 16px">
-      <div class="card-body">
-        <form
-          class="needs-validation"
-          novalidate
-          action="/send"
-          method="POST"
-          id="form_id"
-        >
-          <div class="form-row">
-            <div class="form-group col-md-6 mb-3">
-              <label for="first_name">First name</label>
+    <div class="container">
+      <div class="card mx-auto shadow border">
+        <div class="card-body">
+          <form
+            class="needs-validation"
+            novalidate
+            action="/send"
+            method="POST"
+            id="form_id"
+          >
+            <div class="form-row">
+              <div class="form-group col-md-6 mb-3">
+                <label for="first_name">First name</label>
+                <input
+                  name="first_name"
+                  type="text"
+                  class="form-control"
+                  id="first_name"
+                  maxlength="50"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Please enter your first name.
+                </div>
+              </div>
+              <div class="form-group col-md-6 mb-3">
+                <label for="last_name">Last name</label>
+                <input
+                  name="last_name"
+                  type="text"
+                  class="form-control"
+                  id="last_name"
+                  maxlength="100"
+                  required
+                />
+                <div class="invalid-feedback">Please enter your last name.</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
               <input
-                name="first_name"
-                type="text"
+                name="email"
+                type="email"
                 class="form-control"
-                id="first_name"
-                maxlength="50"
+                id="email"
+                maxlength="250"
                 required
               />
-              <div class="invalid-feedback">Please enter your first name.</div>
+              <div class="invalid-feedback" id="emailFeedback">
+                Please enter your email.
+              </div>
             </div>
-            <div class="form-group col-md-6 mb-3">
-              <label for="last_name">Last name</label>
+            <div class="form-group">
+              <label for="own_country_id">Country</label>
+              <select
+                name="own_country_id"
+                class="custom-select"
+                id="own_country_id"
+                required
+              >
+                <option selected disabled value>Select here</option>
+                {% for o in sorted_countries %}
+                <option value="{{ o.country_id}}">{{ o.country }}</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">
+                Please select your country. Where are you from?
+              </div>
+            </div>
+            <br />
+            <div>
+              <b
+                >Now it's time to fill in your favorites. Please select
+                below.</b
+              >
+            </div>
+            <br />
+            <div class="form-group">
+              <label>What is your favorite animal?</label>
+              <select
+                name="favorite_animal_id"
+                class="custom-select"
+                id="favorite_animal_id"
+                required
+              >
+                <option selected disabled value>Select here</option>
+                {% for animal_id, animal in sorted_animals %}
+                <option value="{{ animal_id }}">{{ animal }}</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">
+                Please select your favorite animal.
+              </div>
+            </div>
+            <div class="form-group" id="other_input" style="display: none">
+              <label><b>Enter other animal:</b></label>
               <input
-                name="last_name"
+                name="other_animal"
                 type="text"
                 class="form-control"
-                id="last_name"
-                maxlength="100"
-                required
+                id="other_animal"
+                maxlength="250"
               />
-              <div class="invalid-feedback">Please enter your last name.</div>
+              <div class="invalid-feedback">
+                Please enter the name of your favorite animal.
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              name="email"
-              type="email"
-              class="form-control"
-              id="email"
-              maxlength="250"
-              required
-            />
-            <div class="invalid-feedback" id="emailFeedback">
-              Please enter your email.
+            <div class="form-group">
+              <label for="favorite_country_id"
+                >What is your favorite country?</label
+              >
+              <select
+                name="favorite_country_id"
+                class="custom-select"
+                id="favorite_country_id"
+                required
+              >
+                <option selected disabled value>Select here</option>
+                {% for o in sorted_countries %}
+                <option value="{{ o.country_id }}">{{ o.country }}</option>
+                {% endfor %}
+              </select>
+              <div class="invalid-feedback">
+                Please select your favorite country.
+              </div>
             </div>
-          </div>
-          <div class="form-group">
-            <label for="own_country_id">Country</label>
-            <select
-              name="own_country_id"
-              class="custom-select"
-              id="own_country_id"
-              required
-            >
-              <option selected disabled value>Select here</option>
-              {% for o in sorted_countries %}
-              <option value="{{ o.country_id}}">{{ o.country }}</option>
-              {% endfor %}
-            </select>
-            <div class="invalid-feedback">
-              Please select your country. Where are you from?
+            <br />
+            <div class="text-center">
+              <button type="submit" class="custom-button" value="Send">
+                Submit form
+              </button>
             </div>
-          </div>
-          <br />
-          <div>
-            <b>Now it's time to fill in your favorites. Please select below.</b>
-          </div>
-          <br />
-          <div class="form-group">
-            <label>What is your favorite animal?</label>
-            <select
-              name="favorite_animal_id"
-              class="custom-select"
-              id="favorite_animal_id"
-              required
-            >
-              <option selected disabled value>Select here</option>
-              {% for animal_id, animal in sorted_animals %}
-              <option value="{{ animal_id }}">{{ animal }}</option>
-              {% endfor %}
-            </select>
-            <div class="invalid-feedback">
-              Please select your favorite animal.
-            </div>
-          </div>
-          <div class="form-group" id="other_input" style="display: none">
-            <label><b>Enter other animal:</b></label>
-            <input
-              name="other_animal"
-              type="text"
-              class="form-control"
-              id="other_animal"
-              maxlength="250"
-            />
-            <div class="invalid-feedback">
-              Please enter the name of your favorite animal.
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="favorite_country_id"
-              >What is your favorite country?</label
-            >
-            <select
-              name="favorite_country_id"
-              class="custom-select"
-              id="favorite_country_id"
-              required
-            >
-              <option selected disabled value>Select here</option>
-              {% for o in sorted_countries %}
-              <option value="{{ o.country_id }}">{{ o.country }}</option>
-              {% endfor %}
-            </select>
-            <div class="invalid-feedback">
-              Please select your favorite country.
-            </div>
-          </div>
-          <br />
-          <div class="text-center">
-            <button type="submit" class="custom-button" value="Send">
-              Submit form
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
     <br />

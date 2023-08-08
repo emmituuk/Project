@@ -31,11 +31,17 @@
   padding: 40;
 }
 
-/* mobile-specific layout */
+/* mobile-specific layout for buttons*/
 @media (max-width: 767px) {
   .btn-group-mobile {
-    display: block,
+    display: block;
   }
+}
+
+/* card layout */
+.card {
+  max-width: 40rem;
+  padding: 16px;
 }
 
 /* style for the jumbotrons */
